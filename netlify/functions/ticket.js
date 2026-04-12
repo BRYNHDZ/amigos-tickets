@@ -1,0 +1,39 @@
+exports.handler = async (event) => {
+  const id = event.queryStringParameters?.id;
+
+  if (!id) {
+    return { statusCode: 400, body: JSON.stringify({ error: "No ticket ID provided" }) };
+  }
+
+  const token = process.env.NOTION_TOKEN;
+
+  const res = await fetch(`https://api.notion.com/v1/pages/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Notion-Version": "2022-06-28",
+    },
+  });
+
+  if (!res.ok) {
+    return { statusCode: 404, body: JSON.stringify({ error: "Ticket not found" }) };
+  }
+
+  const data = await res.json();
+  const p = data.properties;
+
+  const ticket = {
+    customerName: p["Customer Name"]?.title?.[0]?.plain_text || "",
+    priority: p["Current Priority"]?.select?.name || "",
+    incidentDate: p["Incident Date"]?.date?.start || "",
+    fieldAction: p["Field Action"]?.rich_text?.map((r) => r.plain_text).join("") || "",
+    assignedTo: p["Assigned To"]?.people?.map((u) => u.name).join(", ") || "",
+    crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
+    status: p["Status"]?.status?.name || "",
+  };
+
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    body: JSON.stringify(ticket),
+  };
+};
