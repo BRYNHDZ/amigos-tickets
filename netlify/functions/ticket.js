@@ -26,14 +26,14 @@ exports.handler = async (event) => {
 
   const ticket = {
     customerName: p["Customer Name"]?.title?.[0]?.plain_text || "",
+    complaintId: p["Complaint ID (auto)"]?.formula?.string || "",
     priority: p["Current Priority"]?.select?.name || "",
     incidentDate: p["Incident Date"]?.date?.start || "",
     complaint: p["Complaint"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     description: p["Description"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     fieldAction: p["Field Action"]?.rich_text?.map((r) => r.plain_text).join("") || "",
-    assignedTo: p["Assigned To"]?.people?.map((u) => u.name).join(", ") || "",
+    assignedTo: p["Assigned To"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
-    status: p["Status"]?.status?.name || "",
   };
 
   return {
