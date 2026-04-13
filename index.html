@@ -4,142 +4,168 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Field Ticket — Amigos Landscaping</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f0;
-      color: #1a1a1a;
+      font-family: 'Nunito', sans-serif;
+      background: #F3F4F6;
       min-height: 100vh;
+      padding-bottom: 48px;
+      color: #4B5563;
     }
 
     .header {
       background: #30471F;
-      padding: 20px 24px 18px;
+      padding: 24px 24px 20px;
     }
 
     .header-label {
+      font-family: 'Nunito', sans-serif;
       font-size: 11px;
-      letter-spacing: 0.1em;
+      font-weight: 700;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #9fbd8a;
+      color: rgba(249,250,251,0.6);
       margin-bottom: 4px;
     }
 
     .header-title {
-      font-size: 22px;
-      font-weight: 600;
-      color: #fff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.2;
     }
 
     .card {
-      background: #fff;
-      border-radius: 12px;
+      background: #FFFFFF;
+      border-radius: 2rem;
       margin: 16px;
       overflow: hidden;
-      border: 1px solid #e8e8e4;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);
     }
 
     .row {
-      padding: 16px 20px;
-      border-bottom: 1px solid #f0f0ec;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+      padding: 18px 24px;
+      border-bottom: 1px solid #E5E7EB;
     }
 
     .row:last-child { border-bottom: none; }
 
-    .row-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
+    .row-split {
+      padding: 18px 24px;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      gap: 24px;
+    }
+
+    .row-split > div { flex: 1; }
+
+    .label {
+      font-family: 'Nunito', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #888;
+      color: #9CA3AF;
       margin-bottom: 5px;
     }
 
-    .row-value {
+    .value {
+      font-family: 'Nunito', sans-serif;
       font-size: 15px;
-      color: #1a1a1a;
-      line-height: 1.5;
+      font-weight: 400;
+      color: #18240F;
+      line-height: 1.6;
     }
 
-    .row-value.empty { color: #bbb; font-style: italic; }
+    .value.muted { color: #9CA3AF; font-style: italic; }
 
     .priority-badge {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       white-space: nowrap;
     }
 
     .priority-Low    { background: #e6f0fb; color: #185FA5; }
-    .priority-Medium { background: #faeeda; color: #854F0B; }
-    .priority-High   { background: #FAECE7; color: #993C1D; }
-    .priority-Urgent { background: #fcebeb; color: #A32D2D; }
+    .priority-Medium { background: #FFF8E1; color: #B37F00; }
+    .priority-High   { background: #FFF3E0; color: #E65100; }
+    .priority-Urgent { background: #FFEBEE; color: #C62828; }
 
-    .steps {
-      padding: 16px 20px;
-      border-bottom: 1px solid #f0f0ec;
+    .steps-section {
+      padding: 18px 24px;
+      border-bottom: 1px solid #E5E7EB;
     }
-
-    .steps .row-label { margin-bottom: 12px; }
 
     .step {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 10px;
+      margin-top: 10px;
     }
 
-    .step:last-child { margin-bottom: 0; }
-
     .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      border-radius: 9999px;
       background: #30471F;
       color: #fff;
+      font-family: 'Nunito', sans-serif;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      margin-top: 1px;
+      margin-top: 2px;
     }
 
     .step-text {
+      font-family: 'Nunito', sans-serif;
       font-size: 14px;
-      color: #1a1a1a;
-      line-height: 1.5;
+      color: #18240F;
+      line-height: 1.6;
       padding-top: 3px;
     }
 
-    .footer-note {
-      background: #f5f5f0;
-      padding: 16px 20px;
+    .footer-row {
+      padding: 18px 24px;
+      background: #F3F4F6;
+      border-top: 1px solid #E5E7EB;
     }
 
-    .footer-note .row-label { margin-bottom: 6px; }
-    .footer-note p { font-size: 13px; color: #555; line-height: 1.5; }
+    .footer-row .value {
+      font-size: 14px;
+      color: #4B5563;
+    }
+
+    .gold-bar {
+      width: 3rem;
+      height: 3px;
+      background: #FFB300;
+      border-radius: 9999px;
+      margin-bottom: 6px;
+    }
 
     .loading, .error-state {
       text-align: center;
       padding: 60px 24px;
-      color: #888;
+      color: #9CA3AF;
+      font-family: 'Nunito', sans-serif;
     }
 
-    .loading-spinner {
+    .spinner {
       width: 32px;
       height: 32px;
-      border: 3px solid #e0e0d8;
+      border: 3px solid #E5E7EB;
       border-top-color: #30471F;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
@@ -147,9 +173,6 @@
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .error-icon { font-size: 32px; margin-bottom: 12px; }
-    .error-state p { font-size: 14px; }
   </style>
 </head>
 <body>
@@ -161,7 +184,7 @@
 
   <div id="app">
     <div class="loading">
-      <div class="loading-spinner"></div>
+      <div class="spinner"></div>
       <p>Loading ticket...</p>
     </div>
   </div>
@@ -170,99 +193,72 @@
     const params = new URLSearchParams(window.location.search);
     const ticketId = params.get("id");
 
-    function fmt(date) {
-      if (!date) return "";
-      const d = new Date(date + "T12:00:00");
-      return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    function fmt(d) {
+      if (!d) return "";
+      return new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
     }
 
     function parseSteps(text) {
       if (!text) return [];
-      return text
-        .split(/\n/)
-        .map(s => s.replace(/^\d+[\.\)]\s*/, "").trim())
-        .filter(Boolean);
+      return text.split(/\n/).map(s => s.replace(/^\d+[\.\)]\s*/, "").trim()).filter(Boolean);
     }
 
-    function render(ticket) {
-      const steps = parseSteps(ticket.fieldAction);
-      const hasSteps = steps.length > 1;
+    function row(label, value) {
+      if (!value) return "";
+      return `<div class="row"><div class="label">${label}</div><div class="value">${value}</div></div>`;
+    }
 
-      document.getElementById("header-title").textContent =
-        ticket.customerName ? `Field Ticket — ${ticket.customerName}` : "Field Ticket";
+    function render(t) {
+      document.getElementById("header-title").textContent = t.customerName ? `Field Ticket — ${t.customerName}` : "Field Ticket";
 
-      const priorityClass = ticket.priority
-        ? `priority-badge priority-${ticket.priority}`
-        : "priority-badge priority-Low";
+      const steps = parseSteps(t.fieldAction);
+      const badge = t.priority ? `<span class="priority-badge priority-${t.priority}">${t.priority}</span>` : "";
 
       document.getElementById("app").innerHTML = `
         <div class="card">
 
-          <div class="row">
+          <div class="row" style="display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <div class="row-label">Client</div>
-              <div class="row-value">${ticket.customerName || "—"}</div>
+              <div class="label">Client</div>
+              <div class="value" style="font-size:17px;font-weight:700;color:#18240F;">${t.customerName || "—"}</div>
             </div>
-            ${ticket.priority
-              ? `<span class="${priorityClass}">${ticket.priority}</span>`
-              : ""}
+            ${badge}
           </div>
 
-          <div class="row">
-            <div style="flex:1">
-              <div class="row-label">Assigned crew</div>
-              <div class="row-value ${!ticket.assignedTo ? "empty" : ""}">
-                ${ticket.assignedTo || "Not assigned"}
-              </div>
-            </div>
-            ${ticket.incidentDate ? `
+          <div class="row-split">
             <div>
-              <div class="row-label">Date</div>
-              <div class="row-value">${fmt(ticket.incidentDate)}</div>
-            </div>` : ""}
+              <div class="label">Assigned crew</div>
+              <div class="value ${!t.assignedTo ? "muted" : ""}">${t.assignedTo || "Not assigned"}</div>
+            </div>
+            ${t.incidentDate ? `<div><div class="label">Date</div><div class="value">${fmt(t.incidentDate)}</div></div>` : ""}
           </div>
 
-          ${hasSteps ? `
-          <div class="steps">
-            <div class="row-label">What to do</div>
+          ${t.complaint ? `<div class="row"><div class="label">Complaint</div><div class="value">${t.complaint}</div></div>` : ""}
+          ${t.description ? `<div class="row"><div class="label">Details</div><div class="value">${t.description}</div></div>` : ""}
+
+          ${steps.length > 1 ? `
+          <div class="steps-section">
+            <div class="label">What to do</div>
             ${steps.map((s, i) => `
               <div class="step">
                 <div class="step-num">${i + 1}</div>
                 <div class="step-text">${s}</div>
-              </div>
-            `).join("")}
-          </div>` : ticket.fieldAction ? `
-          <div class="row">
-            <div>
-              <div class="row-label">What to do</div>
-              <div class="row-value">${ticket.fieldAction}</div>
-            </div>
-          </div>` : ""}
+              </div>`).join("")}
+          </div>` : t.fieldAction ? row("What to do", t.fieldAction) : ""}
 
-          ${ticket.crewNotes ? `
-          <div class="row">
-            <div>
-              <div class="row-label">Notes</div>
-              <div class="row-value">${ticket.crewNotes}</div>
-            </div>
-          </div>` : ""}
+          ${t.crewNotes ? row("Notes", t.crewNotes) : ""}
 
-          <div class="footer-note">
-            <div class="row-label">When done</div>
-            <p>Text Jesus with a completion update. Take before/after photos if relevant.</p>
+          <div class="footer-row">
+            <div class="gold-bar"></div>
+            <div class="label">When done</div>
+            <div class="value">Text Jesus with a completion update + photos.</div>
           </div>
 
-        </div>
-      `;
+        </div>`;
     }
 
     function showError(msg) {
-      document.getElementById("app").innerHTML = `
-        <div class="error-state">
-          <div class="error-icon">⚠️</div>
-          <p>${msg}</p>
-        </div>
-      `;
+      document.getElementById("app").innerHTML = `<div class="error-state"><p>${msg}</p></div>`;
     }
 
     if (!ticketId) {
@@ -270,10 +266,7 @@
     } else {
       fetch(`/.netlify/functions/ticket?id=${ticketId}`)
         .then(r => r.json())
-        .then(data => {
-          if (data.error) showError(data.error);
-          else render(data);
-        })
+        .then(data => { if (data.error) showError(data.error); else render(data); })
         .catch(() => showError("Could not load ticket. Try again."));
     }
   </script>
