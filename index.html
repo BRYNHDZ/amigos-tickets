@@ -3,190 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Field Ticket — Amigos Landscaping</title>
+  <title>Field Ticket</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Nunito', sans-serif;
-      background: #F3F4F6;
-      min-height: 100vh;
-      padding-bottom: 48px;
-      color: #4B5563;
-    }
-
-    .header {
-      background: #30471F;
-      padding: 24px 24px 20px;
-    }
-
-    .header-label {
-      font-family: 'Nunito', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(249,250,251,0.6);
-      margin-bottom: 4px;
-    }
-
-    .header-title {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      color: #FFFFFF;
-      line-height: 1.2;
-    }
-
-    .card {
-      background: #FFFFFF;
-      border-radius: 2rem;
-      margin: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);
-    }
-
-    .row {
-      padding: 18px 24px;
-      border-bottom: 1px solid #E5E7EB;
-    }
-
+    body { font-family: 'Nunito', sans-serif; background: #F3F4F6; min-height: 100vh; padding-bottom: 48px; color: #4B5563; }
+    .header { background: #30471F; padding: 20px 24px 18px; }
+    .header-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(249,250,251,0.6); margin-bottom: 4px; }
+    .header-title { font-family: 'Fredoka', sans-serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2; }
+    .header-id { font-size: 12px; font-weight: 700; color: rgba(249,250,251,0.5); margin-top: 4px; letter-spacing: 0.05em; }
+    .card { background: #fff; border-radius: 2rem; margin: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+    .row { padding: 16px 24px; border-bottom: 1px solid #E5E7EB; }
     .row:last-child { border-bottom: none; }
-
-    .row-split {
-      padding: 18px 24px;
-      border-bottom: 1px solid #E5E7EB;
-      display: flex;
-      gap: 24px;
-    }
-
+    .row-split { padding: 16px 24px; border-bottom: 1px solid #E5E7EB; display: flex; gap: 24px; }
     .row-split > div { flex: 1; }
-
-    .label {
-      font-family: 'Nunito', sans-serif;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #9CA3AF;
-      margin-bottom: 5px;
-    }
-
-    .value {
-      font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-      font-weight: 400;
-      color: #18240F;
-      line-height: 1.6;
-    }
-
+    .label { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 5px; }
+    .value { font-size: 15px; color: #18240F; line-height: 1.6; }
     .value.muted { color: #9CA3AF; font-style: italic; }
-
-    .priority-badge {
-      display: inline-block;
-      padding: 4px 14px;
-      border-radius: 9999px;
-      font-family: 'Nunito', sans-serif;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
+    .priority-badge { display: inline-block; padding: 4px 14px; border-radius: 9999px; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
     .priority-Low    { background: #e6f0fb; color: #185FA5; }
     .priority-Medium { background: #FFF8E1; color: #B37F00; }
     .priority-High   { background: #FFF3E0; color: #E65100; }
     .priority-Urgent { background: #FFEBEE; color: #C62828; }
-
-    .steps-section {
-      padding: 18px 24px;
-      border-bottom: 1px solid #E5E7EB;
-    }
-
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .step-num {
-      width: 26px;
-      height: 26px;
-      border-radius: 9999px;
-      background: #30471F;
-      color: #fff;
-      font-family: 'Nunito', sans-serif;
-      font-size: 12px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .step-text {
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px;
-      color: #18240F;
-      line-height: 1.6;
-      padding-top: 3px;
-    }
-
-    .footer-row {
-      padding: 18px 24px;
-      background: #F3F4F6;
-      border-top: 1px solid #E5E7EB;
-    }
-
-    .footer-row .value {
-      font-size: 14px;
-      color: #4B5563;
-    }
-
-    .gold-bar {
-      width: 3rem;
-      height: 3px;
-      background: #FFB300;
-      border-radius: 9999px;
-      margin-bottom: 6px;
-    }
-
-    .loading, .error-state {
-      text-align: center;
-      padding: 60px 24px;
-      color: #9CA3AF;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #E5E7EB;
-      border-top-color: #30471F;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-
+    .steps-section { padding: 16px 24px; border-bottom: 1px solid #E5E7EB; }
+    .step { display: flex; align-items: flex-start; gap: 12px; margin-top: 10px; }
+    .step-num { width: 26px; height: 26px; border-radius: 9999px; background: #30471F; color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .step-text { font-size: 14px; color: #18240F; line-height: 1.6; padding-top: 3px; }
+    .footer-row { background: #F3F4F6; padding: 18px 24px; }
+    .gold-bar { width: 3rem; height: 3px; background: #FFB300; border-radius: 9999px; margin-bottom: 8px; }
+    .footer-row .value { font-size: 14px; color: #4B5563; }
+    .sms-btn { display: inline-block; margin-top: 12px; background: #30471F; color: #F9FAFB; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; padding: 10px 20px; border-radius: 9999px; text-decoration: none; }
+    .loading, .error-state { text-align: center; padding: 60px 24px; color: #9CA3AF; }
+    .spinner { width: 32px; height: 32px; border: 3px solid #E5E7EB; border-top-color: #30471F; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-
   <div class="header">
-    <div class="header-label">Amigos Landscaping</div>
+    <div class="header-eyebrow">Amigos Landscaping</div>
     <div class="header-title" id="header-title">Field Ticket</div>
+    <div class="header-id" id="header-id"></div>
   </div>
 
   <div id="app">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading ticket...</p>
-    </div>
+    <div class="loading"><div class="spinner"></div><p>Loading ticket...</p></div>
   </div>
 
   <script>
@@ -210,17 +70,18 @@
 
     function render(t) {
       document.getElementById("header-title").textContent = t.customerName ? `Field Ticket — ${t.customerName}` : "Field Ticket";
+      if (t.complaintId) document.getElementById("header-id").textContent = t.complaintId;
 
       const steps = parseSteps(t.fieldAction);
       const badge = t.priority ? `<span class="priority-badge priority-${t.priority}">${t.priority}</span>` : "";
+      const smsBody = encodeURIComponent(`Job complete. Ticket: ${t.complaintId || "N/A"} — ${t.customerName || ""}`);
 
       document.getElementById("app").innerHTML = `
         <div class="card">
-
           <div class="row" style="display:flex;justify-content:space-between;align-items:center;">
             <div>
               <div class="label">Client</div>
-              <div class="value" style="font-size:17px;font-weight:700;color:#18240F;">${t.customerName || "—"}</div>
+              <div class="value" style="font-size:17px;font-weight:700;">${t.customerName || "—"}</div>
             </div>
             ${badge}
           </div>
@@ -230,30 +91,26 @@
               <div class="label">Assigned crew</div>
               <div class="value ${!t.assignedTo ? "muted" : ""}">${t.assignedTo || "Not assigned"}</div>
             </div>
-            ${t.incidentDate ? `<div><div class="label">Date</div><div class="value">${fmt(t.incidentDate)}</div></div>` : ""}
+            ${t.incidentDate ? `<div><div class="label">Incident date</div><div class="value">${fmt(t.incidentDate)}</div></div>` : ""}
           </div>
 
-          ${t.complaint ? `<div class="row"><div class="label">Complaint</div><div class="value">${t.complaint}</div></div>` : ""}
-          ${t.description ? `<div class="row"><div class="label">Details</div><div class="value">${t.description}</div></div>` : ""}
+          ${row("Complaint", t.complaint)}
+          ${row("Details", t.description)}
 
           ${steps.length > 1 ? `
           <div class="steps-section">
             <div class="label">What to do</div>
-            ${steps.map((s, i) => `
-              <div class="step">
-                <div class="step-num">${i + 1}</div>
-                <div class="step-text">${s}</div>
-              </div>`).join("")}
-          </div>` : t.fieldAction ? row("What to do", t.fieldAction) : ""}
+            ${steps.map((s, i) => `<div class="step"><div class="step-num">${i + 1}</div><div class="step-text">${s}</div></div>`).join("")}
+          </div>` : row("What to do", t.fieldAction)}
 
-          ${t.crewNotes ? row("Notes", t.crewNotes) : ""}
+          ${row("Notes", t.crewNotes)}
 
           <div class="footer-row">
             <div class="gold-bar"></div>
             <div class="label">When done</div>
-            <div class="value">Text Jesus with a completion update + photos.</div>
+            <div class="value">Send a text to the office with your completion confirmation, ticket number, and any photos.</div>
+            <a href="sms:+16304466446&body=${smsBody}" class="sms-btn">Text the office</a>
           </div>
-
         </div>`;
     }
 
