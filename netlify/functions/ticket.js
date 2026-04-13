@@ -6,6 +6,9 @@ exports.handler = async (event) => {
   }
 
   const token = process.env.NOTION_TOKEN;
+  if (!token) {
+    return { statusCode: 500, body: JSON.stringify({ error: "Server not configured" }) };
+  }
 
   const res = await fetch(`https://api.notion.com/v1/pages/${id}`, {
     headers: {
@@ -25,6 +28,8 @@ exports.handler = async (event) => {
     customerName: p["Customer Name"]?.title?.[0]?.plain_text || "",
     priority: p["Current Priority"]?.select?.name || "",
     incidentDate: p["Incident Date"]?.date?.start || "",
+    complaint: p["Complaint"]?.rich_text?.map((r) => r.plain_text).join("") || "",
+    description: p["Description"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     fieldAction: p["Field Action"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     assignedTo: p["Assigned To"]?.people?.map((u) => u.name).join(", ") || "",
     crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
