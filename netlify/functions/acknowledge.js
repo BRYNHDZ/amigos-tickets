@@ -3,9 +3,9 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  let id;
+  let id, status;
   try {
-    ({ id } = JSON.parse(event.body || "{}"));
+    ({ id, status } = JSON.parse(event.body || "{}"));
   } catch {
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
@@ -13,6 +13,9 @@ exports.handler = async (event) => {
   if (!id) {
     return { statusCode: 400, body: JSON.stringify({ error: "No ticket ID provided" }) };
   }
+
+  const allowed = new Set(["Resolved", "Completed"]);
+  const newStatus = allowed.has(status) ? status : "Resolved";
 
   const token = process.env.NOTION_TOKEN;
   if (!token) {
@@ -30,7 +33,7 @@ exports.handler = async (event) => {
     },
     body: JSON.stringify({
       properties: {
-        "🔵 Status": { status: { name: "Completed" } },
+        "🔵 Status": { status: { name: newStatus } },
         "🔵 Date Resolved": { date: { start: today } },
       },
     }),
@@ -44,6 +47,6 @@ exports.handler = async (event) => {
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-    body: JSON.stringify({ ok: true, status: "Completed", dateResolved: today }),
+    body: JSON.stringify({ ok: true, status: newStatus, dateResolved: today }),
   };
 };

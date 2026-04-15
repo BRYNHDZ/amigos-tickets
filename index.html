@@ -79,7 +79,7 @@
 
     function render(t) {
       document.getElementById("header-title").textContent = t.customerName ? `Field Ticket — ${t.customerName}` : "Field Ticket";
-      if (t.complaintId) document.getElementById("header-id").textContent = t.complaintId;
+      if (t.ticketId) document.getElementById("header-id").textContent = t.ticketId;
 
       const steps = parseSteps(t.fieldAction);
       const badge = t.priority ? `<span class="priority-badge priority-${t.priority}">${t.priority}</span>` : "";
@@ -104,7 +104,7 @@
             ${t.incidentDate ? `<div><div class="label">Incident date</div><div class="value">${fmt(t.incidentDate)}</div></div>` : ""}
           </div>
 
-          ${row("Complaint", t.complaint)}
+          ${row("Ticket description", t.ticketDescription)}
           ${row("Details", t.description)}
 
           ${steps.length > 1 ? `
@@ -159,12 +159,12 @@
       return `sms:${OFFICE_SMS}&body=${encodeURIComponent(body)}`;
     }
 
-    async function markDone(id) {
+    async function markDone(id, status) {
       try {
         const res = await fetch("/.netlify/functions/acknowledge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ id, status }),
         });
         return res.ok;
       } catch {
@@ -173,12 +173,14 @@
     }
 
     function wireActions(t) {
+      const id = new URLSearchParams(window.location.search).get("id");
+
       const ackBtn = document.getElementById("ack-btn");
       if (ackBtn) {
         ackBtn.addEventListener("click", async () => {
           ackBtn.disabled = true;
           ackBtn.textContent = "Saving...";
-          const ok = await markDone(t.id || new URLSearchParams(window.location.search).get("id"));
+          const ok = await markDone(id, "Completed");
           if (ok) {
             ackBtn.parentElement.outerHTML = `<div class="done-badge">Acknowledged</div>`;
           } else {
@@ -196,19 +198,18 @@
         });
       }
 
-      const ticketRef = t.complaintId || "N/A";
+      const ticketRef = t.ticketId || "N/A";
       const customer = t.customerName || "";
       const withPhoto = document.getElementById("complete-with-photo");
       const noPhoto = document.getElementById("complete-no-photo");
-      const id = new URLSearchParams(window.location.search).get("id");
 
       if (withPhoto) {
         withPhoto.href = smsLink(`Ticket ${ticketRef} is complete. Photos attached. — ${customer}`);
-        withPhoto.addEventListener("click", () => { markDone(id); });
+        withPhoto.addEventListener("click", () => { markDone(id, "Resolved"); });
       }
       if (noPhoto) {
         noPhoto.href = smsLink(`Ticket ${ticketRef} is complete. No photos. — ${customer}`);
-        noPhoto.addEventListener("click", () => { markDone(id); });
+        noPhoto.addEventListener("click", () => { markDone(id, "Resolved"); });
       }
     }
 
