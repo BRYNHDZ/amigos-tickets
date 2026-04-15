@@ -34,6 +34,8 @@ exports.handler = async (event) => {
     fieldAction: p["Field Action"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     assignedTo: p["Assigned To"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
+    ticketType: p["Ticket Type"]?.select?.name || "Action Required",
+    status: p["🔵 Status"]?.status?.name || "",
   };
 
   return {
