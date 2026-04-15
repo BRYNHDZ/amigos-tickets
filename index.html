@@ -42,18 +42,12 @@
     .helper { font-size: 13px; color: #6B7280; margin-top: 10px; line-height: 1.5; }
     .done-badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 18px; background: #E8F5E9; color: #2E7D32; border-radius: 9999px; font-size: 14px; font-weight: 700; }
     .done-badge::before { content: "✓"; font-size: 16px; }
-    .alert-box { margin-top: 12px; padding: 14px 18px; background: #FFF3E0; border: 1.5px solid #E65100; border-radius: 16px; color: #18240F; }
-    .alert-box .alert-title { font-size: 14px; font-weight: 800; color: #E65100; margin-bottom: 4px; }
-    .alert-box .alert-body { font-size: 13px; line-height: 1.5; }
-    .office-helper { margin-top: 16px; padding: 14px 18px; background: #F3F4F6; border-radius: 16px; }
-    .office-helper .oh-title { font-size: 12px; font-weight: 800; color: #30471F; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
-    .office-helper .oh-subtitle { font-size: 12px; color: #6B7280; margin-bottom: 10px; line-height: 1.5; }
-    .oh-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #E5E7EB; }
-    .oh-row:last-child { border-bottom: none; }
-    .oh-name { font-size: 13px; font-weight: 800; color: #18240F; min-width: 72px; }
-    .oh-link { flex: 1; font-size: 11px; color: #6B7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
-    .oh-copy { background: #30471F; color: #fff; border: none; border-radius: 9999px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; }
-    .oh-copy.copied { background: #2E7D32; }
+    .ack-list { margin-top: 12px; }
+    .ack-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E5E7EB; }
+    .ack-row:last-child { border-bottom: none; }
+    .ack-name { font-size: 15px; font-weight: 700; color: #18240F; }
+    .ack-done { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #E8F5E9; color: #2E7D32; border-radius: 9999px; font-size: 13px; font-weight: 700; }
+    .ack-done::before { content: "✓"; }
     .mistake-link { display: block; margin-top: 14px; font-size: 12px; color: #6B7280; text-decoration: underline; text-align: center; }
     .mistake-link:hover { color: #30471F; }
     .photos-section { padding: 16px 24px; border-bottom: 1px solid #E5E7EB; }
@@ -88,8 +82,6 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const ticketId = params.get("id");
-    const whoParam = params.get("who");
-    const whoTitle = whoParam ? whoParam.trim().charAt(0).toUpperCase() + whoParam.trim().slice(1).toLowerCase() : null;
 
     function fmt(d) {
       if (!d) return "";
@@ -172,35 +164,34 @@
 
     function renderAck(t) {
       const assigned = parseNames(t.assignedTo);
-      const assignedLower = assigned.map(n => n.toLowerCase());
       const acked = parseNames(t.acknowledgedBy);
       const ackedLower = new Set(acked.map(n => n.toLowerCase()));
 
-      if (!whoTitle) {
-        return renderLinkError("This link isn't tied to a specific person. Ask the office to resend you a personalized link.") + renderOfficeHelper(assigned) + renderMistakeLink(t);
-      }
-      if (assigned.length && !assignedLower.includes(whoTitle.toLowerCase())) {
-        return renderLinkError(`This link is for ${whoTitle}, but this ticket is assigned to ${joinAnd(assigned)}. Ask the office to resend the right link.`) + renderOfficeHelper(assigned) + renderMistakeLink(t);
-      }
-
-      const alreadyAcked = ackedLower.has(whoTitle.toLowerCase());
-      const waiting = assigned.filter(n => !ackedLower.has(n.toLowerCase()));
-
-      if (alreadyAcked) {
-        const waitMsg = waiting.length
-          ? `Thanks, ${whoTitle}. Still waiting on ${joinAnd(waiting)}.`
-          : `Thanks, ${whoTitle}. Everyone has acknowledged.`;
+      if (assigned.length === 0) {
         return `
           <div class="label">No action required</div>
-          <div class="done-badge">${waitMsg}</div>`;
+          <div class="value">Please review the note above and acknowledge that you've seen it.</div>
+          <div class="btn-stack">
+            <button type="button" class="sms-btn ack-btn" data-who="">I acknowledge</button>
+          </div>
+          ${renderMistakeLink(t)}`;
       }
+
+      const rows = assigned.map(name => {
+        const done = ackedLower.has(name.toLowerCase());
+        return `
+          <div class="ack-row">
+            <div class="ack-name">${name}</div>
+            ${done
+              ? `<div class="ack-done">Acknowledged</div>`
+              : `<button type="button" class="sms-btn ack-btn" data-who="${name}">I acknowledge</button>`}
+          </div>`;
+      }).join("");
 
       return `
         <div class="label">No action required</div>
-        <div class="value">Hey ${whoTitle} — please review the note above and acknowledge that you've seen it.</div>
-        <div class="btn-stack">
-          <button type="button" id="ack-btn" class="sms-btn">I acknowledge</button>
-        </div>
+        <div class="value">Please review the note above and tap acknowledge next to your name.</div>
+        <div class="ack-list">${rows}</div>
         ${renderMistakeLink(t)}`;
     }
 
@@ -227,37 +218,8 @@
 
     function renderMistakeLink(t) {
       const ref = t.ticketId || "this ticket";
-      const name = whoTitle || "me";
-      const body = encodeURIComponent(`Hey — I got ticket ${ref} assigned to ${name} but I think it's a mistake or the wrong person. Can you check?`);
+      const body = encodeURIComponent(`Hey — I got ticket ${ref} but I think it's a mistake or wasn't meant for us. Can you check?`);
       return `<a href="sms:${OFFICE_SMS}&body=${body}" class="mistake-link">Got this by mistake? Let the office know</a>`;
-    }
-
-    function renderLinkError(body) {
-      return `
-        <div class="alert-box">
-          <div class="alert-title">Oops — this link isn't valid</div>
-          <div class="alert-body">${body}</div>
-        </div>`;
-    }
-
-    function renderOfficeHelper(assigned) {
-      if (!assigned.length) return "";
-      const base = window.location.origin + window.location.pathname + "?id=" + encodeURIComponent(ticketId);
-      const rows = assigned.map(name => {
-        const link = `${base}&who=${encodeURIComponent(name)}`;
-        return `
-          <div class="oh-row">
-            <div class="oh-name">${name}</div>
-            <div class="oh-link">${link}</div>
-            <button type="button" class="oh-copy" data-link="${link}">Copy</button>
-          </div>`;
-      }).join("");
-      return `
-        <div class="office-helper">
-          <div class="oh-title">For the office</div>
-          <div class="oh-subtitle">Send one of these links per crew member via SMS. Each person only sees their own name-tagged version.</div>
-          ${rows}
-        </div>`;
     }
 
     function renderComplete(t) {
@@ -295,26 +257,24 @@
     function wireActions(t) {
       const id = new URLSearchParams(window.location.search).get("id");
 
-      const ackBtn = document.getElementById("ack-btn");
-      if (ackBtn) {
-        ackBtn.addEventListener("click", async () => {
-          ackBtn.disabled = true;
-          ackBtn.textContent = "Saving...";
-          const result = await markDone(id, "Completed", whoTitle);
+      document.querySelectorAll(".ack-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const who = btn.getAttribute("data-who") || "";
+          btn.disabled = true;
+          btn.textContent = "Saving...";
+          const result = await markDone(id, "Completed", who);
           if (result.ok) {
-            let msg;
             if (result.allDone) {
-              msg = whoTitle ? `Thanks, ${whoTitle}. Ticket closed.` : `Acknowledged.`;
-            } else {
-              msg = `Thanks, ${result.who || whoTitle}. Still waiting on ${joinAnd(result.waiting || [])}.`;
+              location.reload();
+              return;
             }
-            ackBtn.parentElement.outerHTML = `<div class="done-badge">${msg}</div>`;
+            btn.outerHTML = `<div class="ack-done">Acknowledged</div>`;
           } else {
-            ackBtn.disabled = false;
-            ackBtn.textContent = "Try again";
+            btn.disabled = false;
+            btn.textContent = "Try again";
           }
         });
-      }
+      });
 
       const showOpts = document.getElementById("show-options-btn");
       if (showOpts) {
@@ -354,20 +314,6 @@
         if (e.target === lightbox) { lightbox.classList.remove("active"); lightboxImg.src = ""; }
       });
 
-      document.querySelectorAll(".oh-copy").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const link = btn.getAttribute("data-link");
-          try {
-            await navigator.clipboard.writeText(link);
-            const original = btn.textContent;
-            btn.textContent = "Copied";
-            btn.classList.add("copied");
-            setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1500);
-          } catch {
-            btn.textContent = "Select & copy";
-          }
-        });
-      });
     }
 
     function showError(msg) {
