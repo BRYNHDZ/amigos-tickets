@@ -50,6 +50,7 @@
     .ack-done::before { content: "✓"; }
     .mistake-link { display: block; margin-top: 14px; font-size: 12px; color: #6B7280; text-decoration: underline; text-align: center; }
     .mistake-link:hover { color: #30471F; }
+    .address-link { color: #185FA5; text-decoration: underline; font-size: 15px; line-height: 1.4; }
     .photos-section { padding: 16px 24px; border-bottom: 1px solid #E5E7EB; }
     .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 8px; }
     .photo-thumb { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #E5E7EB; cursor: pointer; }
@@ -135,6 +136,7 @@
             ${t.incidentDate ? `<div><div class="label">Incident date</div><div class="value">${fmt(t.incidentDate)}</div></div>` : ""}
           </div>
 
+          ${renderAddress(t.address)}
           ${row("Ticket description", t.ticketDescription)}
           ${row("Details", t.description)}
 
@@ -193,6 +195,18 @@
         <div class="value">Please review the note above and tap acknowledge next to your name.</div>
         <div class="ack-list">${rows}</div>
         ${renderMistakeLink(t)}`;
+    }
+
+    function renderAddress(address) {
+      if (!address) return "";
+      const encoded = encodeURIComponent(address);
+      const ua = navigator.userAgent;
+      const mapsUrl = /iPhone|iPad|iPod|Macintosh/.test(ua)
+        ? `maps://?q=${encoded}`
+        : /Android/.test(ua)
+          ? `geo:0,0?q=${encoded}`
+          : `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+      return `<div class="row"><div class="label">Address</div><div class="value"><a href="${mapsUrl}" class="address-link">${address}</a></div></div>`;
     }
 
     function renderPhotos(photos) {
