@@ -61,6 +61,8 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const ticketId = params.get("id");
+    const whoParam = params.get("who");
+    const whoTitle = whoParam ? whoParam.trim().charAt(0).toUpperCase() + whoParam.trim().slice(1).toLowerCase() : null;
 
     function fmt(d) {
       if (!d) return "";
@@ -70,6 +72,16 @@
     function parseSteps(text) {
       if (!text) return [];
       return text.split(/\n/).map(s => s.replace(/^\d+[\.\)]\s*/, "").trim()).filter(Boolean);
+    }
+
+    function parseNames(s) {
+      return (s || "").split(",").map(n => n.trim()).filter(Boolean);
+    }
+
+    function joinAnd(names) {
+      if (names.length <= 1) return names.join("");
+      if (names.length === 2) return `${names[0]} and ${names[1]}`;
+      return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
     }
 
     function row(label, value) {
@@ -131,9 +143,29 @@
     }
 
     function renderAck(t) {
+      const assigned = parseNames(t.assignedTo);
+      const acked = parseNames(t.acknowledgedBy);
+      const ackedLower = new Set(acked.map(n => n.toLowerCase()));
+      const alreadyAcked = whoTitle && ackedLower.has(whoTitle.toLowerCase());
+      const waiting = assigned.filter(n => !ackedLower.has(n.toLowerCase()));
+
+      const greeting = whoTitle ? `Hey ${whoTitle} — please review the note above and acknowledge that you've seen it.` : `Please review the note above and acknowledge that you've seen it.`;
+
+      if (alreadyAcked) {
+        const waitMsg = waiting.length
+          ? `Thanks, ${whoTitle}. Still waiting on ${joinAnd(waiting)}.`
+          : `Thanks, ${whoTitle}. Everyone has acknowledged.`;
+        return `
+          <div class="label">No action required</div>
+          <div class="done-badge">${waitMsg}</div>`;
+      }
+
+      const noNameHint = !whoTitle ? `<div class="helper">Your name isn't in this link — ask the office to resend if you're not sure who should tap.</div>` : "";
+
       return `
         <div class="label">No action required</div>
-        <div class="value">Please review the note above and acknowledge that you've seen it. No photos or text needed.</div>
+        <div class="value">${greeting}</div>
+        ${noNameHint}
         <div class="btn-stack">
           <button type="button" id="ack-btn" class="sms-btn">I acknowledge</button>
         </div>`;
@@ -157,16 +189,17 @@
       return `sms:${OFFICE_SMS}&body=${encodeURIComponent(body)}`;
     }
 
-    async function markDone(id, status) {
+    async function markDone(id, status, who) {
       try {
         const res = await fetch("/.netlify/functions/acknowledge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, status }),
+          body: JSON.stringify({ id, status, who }),
         });
-        return res.ok;
+        if (!res.ok) return { ok: false };
+        return await res.json();
       } catch {
-        return false;
+        return { ok: false };
       }
     }
 
@@ -178,9 +211,15 @@
         ackBtn.addEventListener("click", async () => {
           ackBtn.disabled = true;
           ackBtn.textContent = "Saving...";
-          const ok = await markDone(id, "Completed");
-          if (ok) {
-            ackBtn.parentElement.outerHTML = `<div class="done-badge">Acknowledged</div>`;
+          const result = await markDone(id, "Completed", whoTitle);
+          if (result.ok) {
+            let msg;
+            if (result.allDone) {
+              msg = whoTitle ? `Thanks, ${whoTitle}. Ticket closed.` : `Acknowledged.`;
+            } else {
+              msg = `Thanks, ${result.who || whoTitle}. Still waiting on ${joinAnd(result.waiting || [])}.`;
+            }
+            ackBtn.parentElement.outerHTML = `<div class="done-badge">${msg}</div>`;
           } else {
             ackBtn.disabled = false;
             ackBtn.textContent = "Try again";
