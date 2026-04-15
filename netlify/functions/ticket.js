@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     description: p["Description"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     fieldAction: p["Field Action"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     assignedTo: (p["Crew First Names"]?.rollup?.array || []).map((item) => (item.rich_text || []).map((rt) => rt.plain_text).join("") || (item.title || []).map((rt) => rt.plain_text).join("")).filter(Boolean).join(", "),
-    address: p["Address"]?.rich_text?.map((r) => r.plain_text).join("") || "",
+    address: p["Address"]?.place?.name || p["Address"]?.place?.address || p["Address"]?.place?.title || p["Address"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     acknowledgedBy: p["Acknowledged By"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     ticketType: p["Ticket Type"]?.select?.name || "Action Required",
