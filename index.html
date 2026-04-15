@@ -42,6 +42,9 @@
     .helper { font-size: 13px; color: #6B7280; margin-top: 10px; line-height: 1.5; }
     .done-badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 18px; background: #E8F5E9; color: #2E7D32; border-radius: 9999px; font-size: 14px; font-weight: 700; }
     .done-badge::before { content: "✓"; font-size: 16px; }
+    .alert-box { margin-top: 12px; padding: 14px 18px; background: #FFF3E0; border: 1.5px solid #E65100; border-radius: 16px; color: #18240F; }
+    .alert-box .alert-title { font-size: 14px; font-weight: 800; color: #E65100; margin-bottom: 4px; }
+    .alert-box .alert-body { font-size: 13px; line-height: 1.5; }
     .loading, .error-state { text-align: center; padding: 60px 24px; color: #9CA3AF; }
     .spinner { width: 32px; height: 32px; border: 3px solid #E5E7EB; border-top-color: #30471F; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -144,12 +147,19 @@
 
     function renderAck(t) {
       const assigned = parseNames(t.assignedTo);
+      const assignedLower = assigned.map(n => n.toLowerCase());
       const acked = parseNames(t.acknowledgedBy);
       const ackedLower = new Set(acked.map(n => n.toLowerCase()));
-      const alreadyAcked = whoTitle && ackedLower.has(whoTitle.toLowerCase());
-      const waiting = assigned.filter(n => !ackedLower.has(n.toLowerCase()));
 
-      const greeting = whoTitle ? `Hey ${whoTitle} — please review the note above and acknowledge that you've seen it.` : `Please review the note above and acknowledge that you've seen it.`;
+      if (!whoTitle) {
+        return renderLinkError("This link isn't tied to a specific person. Ask the office to resend you a personalized link.");
+      }
+      if (assigned.length && !assignedLower.includes(whoTitle.toLowerCase())) {
+        return renderLinkError(`This link is for ${whoTitle}, but this ticket is assigned to ${joinAnd(assigned)}. Ask the office to resend the right link.`);
+      }
+
+      const alreadyAcked = ackedLower.has(whoTitle.toLowerCase());
+      const waiting = assigned.filter(n => !ackedLower.has(n.toLowerCase()));
 
       if (alreadyAcked) {
         const waitMsg = waiting.length
@@ -160,14 +170,19 @@
           <div class="done-badge">${waitMsg}</div>`;
       }
 
-      const noNameHint = !whoTitle ? `<div class="helper">Your name isn't in this link — ask the office to resend if you're not sure who should tap.</div>` : "";
-
       return `
         <div class="label">No action required</div>
-        <div class="value">${greeting}</div>
-        ${noNameHint}
+        <div class="value">Hey ${whoTitle} — please review the note above and acknowledge that you've seen it.</div>
         <div class="btn-stack">
           <button type="button" id="ack-btn" class="sms-btn">I acknowledge</button>
+        </div>`;
+    }
+
+    function renderLinkError(body) {
+      return `
+        <div class="alert-box">
+          <div class="alert-title">Oops — this link isn't valid</div>
+          <div class="alert-body">${body}</div>
         </div>`;
     }
 
