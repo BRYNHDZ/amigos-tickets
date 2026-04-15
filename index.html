@@ -8,6 +8,8 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Nunito', sans-serif; background: #F3F4F6; min-height: 100vh; padding-bottom: 48px; color: #4B5563; }
+    .card { max-width: 480px; margin: 16px auto; }
+    .header { padding-left: max(20px, calc((100vw - 480px) / 2 + 20px)); padding-right: max(20px, calc((100vw - 480px) / 2 + 20px)); }
     .header { background: #30471F; padding: 20px 24px 18px; }
     .header-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(249,250,251,0.6); margin-bottom: 4px; }
     .header-title { font-family: 'Fredoka', sans-serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2; }
@@ -208,7 +210,7 @@
         : /Android/.test(ua)
           ? `geo:0,0?q=${encoded}`
           : `https://www.google.com/maps/search/?api=1&query=${encoded}`;
-      const embedUrl = `https://maps.google.com/maps?q=${encoded}&t=k&z=19&output=embed`;
+      const embedUrl = `https://maps.google.com/maps?q=${encoded}&t=k&z=20&output=embed`;
       return `
         <div class="row">
           <div class="label">Address</div>
