@@ -142,14 +142,12 @@
     function renderComplete(t) {
       return `
         <div class="label">When done</div>
-        <div class="value">Mark the ticket complete. If you took photos, the "with photos" option will pre-fill a text for you to attach them to.</div>
         <div class="btn-stack" id="complete-initial">
           <button type="button" id="show-options-btn" class="sms-btn yellow">Complete ticket</button>
         </div>
         <div class="btn-stack" id="complete-options" style="display:none;">
           <a href="#" id="complete-with-photo" class="sms-btn yellow">Complete with photos</a>
           <a href="#" id="complete-no-photo" class="sms-btn secondary">Complete without photos</a>
-          <div class="helper">"With photos" opens a text to the office with a pre-filled message — just attach your pictures in Messages and send.</div>
         </div>`;
     }
 
