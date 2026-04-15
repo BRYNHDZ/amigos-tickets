@@ -45,6 +45,25 @@
     .alert-box { margin-top: 12px; padding: 14px 18px; background: #FFF3E0; border: 1.5px solid #E65100; border-radius: 16px; color: #18240F; }
     .alert-box .alert-title { font-size: 14px; font-weight: 800; color: #E65100; margin-bottom: 4px; }
     .alert-box .alert-body { font-size: 13px; line-height: 1.5; }
+    .office-helper { margin-top: 16px; padding: 14px 18px; background: #F3F4F6; border-radius: 16px; }
+    .office-helper .oh-title { font-size: 12px; font-weight: 800; color: #30471F; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .office-helper .oh-subtitle { font-size: 12px; color: #6B7280; margin-bottom: 10px; line-height: 1.5; }
+    .oh-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #E5E7EB; }
+    .oh-row:last-child { border-bottom: none; }
+    .oh-name { font-size: 13px; font-weight: 800; color: #18240F; min-width: 72px; }
+    .oh-link { flex: 1; font-size: 11px; color: #6B7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .oh-copy { background: #30471F; color: #fff; border: none; border-radius: 9999px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; }
+    .oh-copy.copied { background: #2E7D32; }
+    .mistake-link { display: block; margin-top: 14px; font-size: 12px; color: #6B7280; text-decoration: underline; text-align: center; }
+    .mistake-link:hover { color: #30471F; }
+    .photos-section { padding: 16px 24px; border-bottom: 1px solid #E5E7EB; }
+    .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 8px; }
+    .photo-thumb { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #E5E7EB; cursor: pointer; }
+    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+    .photo-lightbox.active { display: flex; }
+    .photo-lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .photo-lightbox .close-x { position: absolute; top: 16px; right: 20px; color: #fff; font-size: 28px; font-weight: 300; cursor: pointer; background: none; border: none; }
     .loading, .error-state { text-align: center; padding: 60px 24px; color: #9CA3AF; }
     .spinner { width: 32px; height: 32px; border: 3px solid #E5E7EB; border-top-color: #30471F; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -59,6 +78,11 @@
 
   <div id="app">
     <div class="loading"><div class="spinner"></div><p>Loading ticket...</p></div>
+  </div>
+
+  <div class="photo-lightbox" id="lightbox">
+    <button type="button" class="close-x" id="lightbox-close">×</button>
+    <img id="lightbox-img" src="" alt="" />
   </div>
 
   <script>
@@ -129,6 +153,7 @@
           </div>` : row("What to do", t.fieldAction)}
 
           ${row("Notes", t.crewNotes)}
+          ${renderPhotos(t.photos)}
 
           <div class="footer-row">
             <div class="gold-bar"></div>
@@ -152,10 +177,10 @@
       const ackedLower = new Set(acked.map(n => n.toLowerCase()));
 
       if (!whoTitle) {
-        return renderLinkError("This link isn't tied to a specific person. Ask the office to resend you a personalized link.");
+        return renderLinkError("This link isn't tied to a specific person. Ask the office to resend you a personalized link.") + renderOfficeHelper(assigned) + renderMistakeLink(t);
       }
       if (assigned.length && !assignedLower.includes(whoTitle.toLowerCase())) {
-        return renderLinkError(`This link is for ${whoTitle}, but this ticket is assigned to ${joinAnd(assigned)}. Ask the office to resend the right link.`);
+        return renderLinkError(`This link is for ${whoTitle}, but this ticket is assigned to ${joinAnd(assigned)}. Ask the office to resend the right link.`) + renderOfficeHelper(assigned) + renderMistakeLink(t);
       }
 
       const alreadyAcked = ackedLower.has(whoTitle.toLowerCase());
@@ -175,7 +200,36 @@
         <div class="value">Hey ${whoTitle} — please review the note above and acknowledge that you've seen it.</div>
         <div class="btn-stack">
           <button type="button" id="ack-btn" class="sms-btn">I acknowledge</button>
+        </div>
+        ${renderMistakeLink(t)}`;
+    }
+
+    function renderPhotos(photos) {
+      if (!photos || !photos.length) return "";
+      const thumbs = photos.map((url, i) => `
+        <div class="photo-thumb" data-url="${url}">
+          <img src="${url}" alt="Photo ${i + 1}" loading="lazy" onerror="handlePhotoError()" />
+        </div>`).join("");
+      return `
+        <div class="photos-section">
+          <div class="label">Photos</div>
+          <div class="photos-grid">${thumbs}</div>
+          <div id="photo-refresh-hint" class="helper" style="display:none; margin-top: 10px;">
+            Photos not loading? <a href="" onclick="event.preventDefault(); location.reload();" style="color:#30471F; font-weight:700; text-decoration:underline;">Refresh the page</a>.
+          </div>
         </div>`;
+    }
+
+    function handlePhotoError() {
+      const hint = document.getElementById("photo-refresh-hint");
+      if (hint) hint.style.display = "block";
+    }
+
+    function renderMistakeLink(t) {
+      const ref = t.ticketId || "this ticket";
+      const name = whoTitle || "me";
+      const body = encodeURIComponent(`Hey — I got ticket ${ref} assigned to ${name} but I think it's a mistake or the wrong person. Can you check?`);
+      return `<a href="sms:${OFFICE_SMS}&body=${body}" class="mistake-link">Got this by mistake? Let the office know</a>`;
     }
 
     function renderLinkError(body) {
@@ -183,6 +237,26 @@
         <div class="alert-box">
           <div class="alert-title">Oops — this link isn't valid</div>
           <div class="alert-body">${body}</div>
+        </div>`;
+    }
+
+    function renderOfficeHelper(assigned) {
+      if (!assigned.length) return "";
+      const base = window.location.origin + window.location.pathname + "?id=" + encodeURIComponent(ticketId);
+      const rows = assigned.map(name => {
+        const link = `${base}&who=${encodeURIComponent(name)}`;
+        return `
+          <div class="oh-row">
+            <div class="oh-name">${name}</div>
+            <div class="oh-link">${link}</div>
+            <button type="button" class="oh-copy" data-link="${link}">Copy</button>
+          </div>`;
+      }).join("");
+      return `
+        <div class="office-helper">
+          <div class="oh-title">For the office</div>
+          <div class="oh-subtitle">Send one of these links per crew member via SMS. Each person only sees their own name-tagged version.</div>
+          ${rows}
         </div>`;
     }
 
@@ -263,6 +337,37 @@
         noPhoto.href = smsLink(`Ticket ${ticketRef} is complete. No photos. — ${customer}`);
         noPhoto.addEventListener("click", () => { markDone(id, "Resolved"); });
       }
+
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      document.querySelectorAll(".photo-thumb").forEach(thumb => {
+        thumb.addEventListener("click", () => {
+          lightboxImg.src = thumb.getAttribute("data-url");
+          lightbox.classList.add("active");
+        });
+      });
+      document.getElementById("lightbox-close")?.addEventListener("click", () => {
+        lightbox.classList.remove("active");
+        lightboxImg.src = "";
+      });
+      lightbox?.addEventListener("click", (e) => {
+        if (e.target === lightbox) { lightbox.classList.remove("active"); lightboxImg.src = ""; }
+      });
+
+      document.querySelectorAll(".oh-copy").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const link = btn.getAttribute("data-link");
+          try {
+            await navigator.clipboard.writeText(link);
+            const original = btn.textContent;
+            btn.textContent = "Copied";
+            btn.classList.add("copied");
+            setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1500);
+          } catch {
+            btn.textContent = "Select & copy";
+          }
+        });
+      });
     }
 
     function showError(msg) {

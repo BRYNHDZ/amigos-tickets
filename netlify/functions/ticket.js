@@ -37,6 +37,7 @@ exports.handler = async (event) => {
     crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     ticketType: p["Ticket Type"]?.select?.name || "Action Required",
     status: p["🔵 Status"]?.status?.name || "",
+    photos: (p["Photos"]?.files || []).map((f) => f.type === "external" ? f.external?.url : f.file?.url).filter(Boolean),
   };
 
   return {
