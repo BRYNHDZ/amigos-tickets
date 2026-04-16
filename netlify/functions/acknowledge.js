@@ -73,7 +73,7 @@ exports.handler = async (event) => {
   const page = await getRes.json();
   const p = page.properties;
 
-  const assigned = (p["Crew First Names"]?.rollup?.array || []).map((item) => (item.rich_text || []).map((rt) => rt.plain_text).join("")).filter(Boolean);
+  const assigned = (p["Crew Names"]?.rollup?.array || []).map((item) => (item.title || []).map((rt) => rt.plain_text).join("") || (item.rich_text || []).map((rt) => rt.plain_text).join("")).filter(Boolean);
   const acked = parseNames(p["Acknowledged By"]?.rich_text?.map((r) => r.plain_text).join(""));
 
   const ackedLower = new Set(acked.map((n) => n.toLowerCase()));

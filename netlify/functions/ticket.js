@@ -32,7 +32,7 @@ exports.handler = async (event) => {
     ticketDescription: p["Ticket Description"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     description: p["Description"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     fieldAction: p["Field Action"]?.rich_text?.map((r) => r.plain_text).join("") || "",
-    assignedTo: (p["Crew First Names"]?.rollup?.array || []).map((item) => (item.rich_text || []).map((rt) => rt.plain_text).join("") || (item.title || []).map((rt) => rt.plain_text).join("")).filter(Boolean).join(", "),
+    assignedTo: (p["Crew Names"]?.rollup?.array || []).map((item) => (item.title || []).map((rt) => rt.plain_text).join("") || (item.rich_text || []).map((rt) => rt.plain_text).join("")).filter(Boolean).join(", "),
     address: p["Address"]?.place?.name || p["Address"]?.place?.address || p["Address"]?.place?.title || p["Address"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     acknowledgedBy: p["Acknowledged By"]?.rich_text?.map((r) => r.plain_text).join("") || "",
     crewNotes: p["Crew Notes"]?.rich_text?.map((r) => r.plain_text).join("") || "",
